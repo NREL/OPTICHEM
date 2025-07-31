@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main Code Documentation &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pareto Documentation" href="pareto.html" />
+    <link rel="prev" title="Main Code Documentation" href="main_run.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#post-optimization-analysis-script">Post-Optimization Analysis Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.create_chord_diagram"><code class="docutils literal notranslate"><span class="pre">create_chord_diagram()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.create_sankey_feedstocks"><code class="docutils literal notranslate"><span class="pre">create_sankey_feedstocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.create_sankey_pathways"><code class="docutils literal notranslate"><span class="pre">create_sankey_pathways()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.merge_feedstock_availability"><code class="docutils literal notranslate"><span class="pre">merge_feedstock_availability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.parse_user_inputs"><code class="docutils literal notranslate"><span class="pre">parse_user_inputs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.plot_feedstock_bars"><code class="docutils literal notranslate"><span class="pre">plot_feedstock_bars()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_run.run_optimization"><code class="docutils literal notranslate"><span class="pre">run_optimization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pareto.html">Pareto Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Main Code Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/optimization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-main_run">
+<span id="main-code-documentation"></span><h1>Main Code Documentation<a class="headerlink" href="#module-main_run" title="Link to this heading"></a></h1>
+<section id="post-optimization-analysis-script">
+<h2>Post-Optimization Analysis Script<a class="headerlink" href="#post-optimization-analysis-script" title="Link to this heading"></a></h2>
+<p>This module performs a post-optimization analysis that includes:</p>
+<ul class="simple">
+<li><p>Running a multi-objective optimization via <code class="xref py py-func docutils literal notranslate"><span class="pre">multiobjective_optimization()</span></code>.</p></li>
+<li><p>Merging feedstock usage data with constraints.</p></li>
+<li><p>Creating a feedstock-availability bar chart.</p></li>
+<li><p>Generating chord and Sankey diagrams for flow visualization.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tghosh</p>
+</dd>
+<dt class="field-even">date<span class="colon">:</span></dt>
+<dd class="field-even"><p>Wed Mar 12 20:42:23 2025</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.create_chord_diagram">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">create_chord_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#create_chord_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.create_chord_diagram" title="Link to this definition"></a></dt>
+<dd><p>Build and display a chord diagram illustrating the flow from feedstock to chemicals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq_df</strong> (<em>pd.DataFrame</em>) -- DataFrame that must include the columns ['Feedstock', 'Chemical', 'Feedstock_flow'].</p></li>
+<li><p><strong>feed_df</strong> (<em>pd.DataFrame</em>) -- DataFrame used to determine main feedstocks.</p></li>
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year, used only for naming or in the figure title if desired.</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em>) -- Path to the folder where the output files will be saved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.create_sankey_feedstocks">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">create_sankey_feedstocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#create_sankey_feedstocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.create_sankey_feedstocks" title="Link to this definition"></a></dt>
+<dd><p>Generate a Sankey diagram showing multi-use feedstocks flowing to chemicals,
+excluding flows that are 100% dedicated to one chemical.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq_df</strong> (<em>pd.DataFrame</em>) -- DataFrame that must contain columns:
+['Feedstock_flow', 'Chemical', 'Feedstock', 'Long name'] for flow details.</p></li>
+<li><p><strong>html_filename</strong> (<em>str</em>) -- File path (including folder) to save the resulting Sankey diagram as an HTML file.</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em>) -- Path to the folder where CSV outputs will be saved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.create_sankey_pathways">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">create_sankey_pathways</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#create_sankey_pathways"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.create_sankey_pathways" title="Link to this definition"></a></dt>
+<dd><p>Generate a Sankey diagram showing multi-use pathways flowing to chemicals,
+excluding flows that are 100% dedicated to one chemical.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq_df</strong> (<em>pd.DataFrame</em>) -- DataFrame that must contain columns:
+['product_flow', 'Chemical', 'Long name'] for flow details.</p></li>
+<li><p><strong>html_filename</strong> (<em>str</em>) -- File path (including folder) to save the resulting Sankey diagram as an HTML file.</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em>) -- Path to the folder where CSV outputs will be saved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.main">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.main" title="Link to this definition"></a></dt>
+<dd><p>Main function tying the whole workflow together.</p>
+<p>The workflow includes:</p>
+<ol class="arabic simple">
+<li><p>Parsing user inputs.</p></li>
+<li><p>Running the optimization.</p></li>
+<li><p>Analyzing feedstock usage by merging with availability.</p></li>
+<li><p>Plotting the feedstock usage bar chart.</p></li>
+<li><p>Creating the chord diagram.</p></li>
+<li><p>Generating Sankey diagrams for feedstock and pathway flows.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.merge_feedstock_availability">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">merge_feedstock_availability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/main_run.html#merge_feedstock_availability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.merge_feedstock_availability" title="Link to this definition"></a></dt>
+<dd><p>Merge the feedstock usage with its availability for the given year, compute the remaining
+availability, and sort the results in descending order of usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feed_df</strong> (<em>pd.DataFrame</em>) -- Feedstock usage dataframe from the optimization.</p></li>
+<li><p><strong>yr</strong> (<em>int</em>) -- The year used for selecting the correct availability column.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A tuple containing:
+- <strong>feed_df_merged</strong> (<em>pd.DataFrame</em>): The merged dataframe with additional columns:</p>
+<blockquote>
+<div><p>['Availability {yr} (MMT)'] and 'Difference'.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>feedstock_avail</strong> (<em>pd.DataFrame</em>): The feedstock availability dataframe.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[pd.DataFrame, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.parse_user_inputs">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">parse_user_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/main_run.html#parse_user_inputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.parse_user_inputs" title="Link to this definition"></a></dt>
+<dd><p>Define or parse user inputs for year, TRL filter, metric, and fix_2030_results toggle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing:
+- <strong>yr</strong> (<em>int</em>): Year to analyze (e.g., 2030 or 2050).
+- <strong>trl</strong> (<em>bool</em>): True if 'High TRL' data should be used.
+- <strong>metric</strong> (<em>str</em>): The name of the metric to optimize (e.g., 'ghg_emissions').
+- <strong>fix_2030_results</strong> (<em>bool</em>): Whether to fix certain flows/variables to a 2030 reference solution.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int, bool, str, bool]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.plot_feedstock_bars">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">plot_feedstock_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#plot_feedstock_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.plot_feedstock_bars" title="Link to this definition"></a></dt>
+<dd><p>Create a stacked horizontal bar chart of feedstock usage versus availability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feed_df</strong> (<em>pd.DataFrame</em>) -- DataFrame with columns ['Feedstock_flow', f'Availability {yr} (MMT)', 'Feedstock'].</p></li>
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year (for labeling).</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em>) -- Path to the folder where the output files will be saved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_run.run_optimization">
+<span class="sig-prename descclassname"><span class="pre">main_run.</span></span><span class="sig-name descname"><span class="pre">run_optimization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_2030_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_run.html#run_optimization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_run.run_optimization" title="Link to this definition"></a></dt>
+<dd><p>Run the multiobjective_optimization function and return the resulting DataFrames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year for constraints (e.g., 2030 or 2050).</p></li>
+<li><p><strong>trl</strong> (<em>bool</em>) -- Whether to filter for high TRL only.</p></li>
+<li><p><strong>fix_2030_results</strong> (<em>bool</em>) -- Whether to constrain flows based on 2030 data.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) -- The metric to optimize.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing:
+- <strong>eq_df</strong> (<em>pd.DataFrame</em>): Detailed optimization results at equation-level.
+- <strong>feed_df</strong> (<em>pd.DataFrame</em>): Aggregated feedstock usage data.
+- <strong>prod_df</strong> (<em>pd.DataFrame</em>): Aggregated product flow data (including co-products).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="main_run.html" class="btn btn-neutral float-left" title="Main Code Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pareto.html" class="btn btn-neutral float-right" title="Pareto Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

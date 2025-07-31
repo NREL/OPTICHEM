@@ -1,0 +1,91 @@
+
+ghg_emissions2030-True-False
+Optimal Solution for metric: ghg_emissions
+Objective value = -26.701962308832048
+Total excess flow:  9.089954466912076e-08
+
+Values of other metrics:
+price_total  208.3098281101627
+ghg_emissions  -26.701962308832044
+human_toxicity  419.3487431765939
+water_depletion  16.04556916321376
+fossil_fuel_depletion  94.65958964229773
+land_use  103340.97636975869
+electricity_use  874.6439813038002
+hydrogen_use  16.53759191515405
+
+price_total2030-True-False
+Optimal Solution for metric: price_total
+Objective value = 128.91491542870295
+Total excess flow:  9.087175456556906e-14
+
+Values of other metrics:
+price_total  128.91491542870293
+ghg_emissions  311.1746748162488
+human_toxicity  177.177479078987
+water_depletion  15.40042788962758
+fossil_fuel_depletion  195.45858861290594
+land_use  64827.57727403337
+electricity_use  49.44647832263874
+hydrogen_use  0.35371813990400014
+
+human_toxicity2030-True-False
+Optimal Solution for metric: human_toxicity
+Objective value = 171.88952373725527
+Total excess flow:  9.089953470486911e-08
+
+Values of other metrics:
+price_total  129.58513233737116
+ghg_emissions  307.3723234217207
+human_toxicity  171.88952373725527
+water_depletion  15.283483559721407
+fossil_fuel_depletion  195.13028087003514
+land_use  64762.95596888182
+electricity_use  49.62391055737252
+hydrogen_use  0.24139740569077112
+
+ghg_emissions2050-False-False
+Optimal Solution for metric: ghg_emissions
+Objective value = -390.6663720740775
+Total excess flow:  9.089963431963e-08
+
+Values of other metrics:
+price_total  391.852389224327
+ghg_emissions  -390.6663720740776
+human_toxicity  518.0689614375618
+water_depletion  15.140757520956596
+fossil_fuel_depletion  81.77171524063904
+land_use  112252.5893649593
+electricity_use  4515.138141793843
+hydrogen_use  8.067159018891244
+
+price_total2050-False-False
+Optimal Solution for metric: price_total
+Objective value = 160.20865901996393
+Total excess flow:  1.9317880628477724e-13
+
+Values of other metrics:
+price_total  160.20865901996393
+ghg_emissions  105.82051707607428
+human_toxicity  195.5044629656228
+water_depletion  17.902558339877135
+fossil_fuel_depletion  227.69984042005808
+land_use  84773.34163634622
+electricity_use  77.71920987502992
+hydrogen_use  -2.5212519401132374
+
+human_toxicity2050-False-False
+Optimal Solution for metric: human_toxicity
+Objective value = 175.1457420006769
+Total excess flow:  9.089969810194276e-08
+
+Values of other metrics:
+price_total  168.37958711633237
+ghg_emissions  87.65032951591049
+human_toxicity  175.1457420006769
+water_depletion  17.565112410125685
+fossil_fuel_depletion  224.3792930035549
+land_use  77903.24785573271
+electricity_use  92.1228907342672
+hydrogen_use  -2.6328281213507503
+All steps completed successfully.

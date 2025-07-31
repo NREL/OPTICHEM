@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>main_run &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimization.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pareto.html">Pareto Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">main_run</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for main_run</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Post-Optimization Analysis Script</span>
+<span class="sd">=================================</span>
+
+<span class="sd">This module performs a post-optimization analysis that includes:</span>
+
+<span class="sd">- Running a multi-objective optimization via :func:`multiobjective_optimization`.</span>
+<span class="sd">- Merging feedstock usage data with constraints.</span>
+<span class="sd">- Creating a feedstock-availability bar chart.</span>
+<span class="sd">- Generating chord and Sankey diagrams for flow visualization.</span>
+
+<span class="sd">:author: tghosh</span>
+<span class="sd">:date: Wed Mar 12 20:42:23 2025</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+
+<span class="c1"># Third-party chord diagram library</span>
+<span class="kn">from</span> <span class="nn">mpl_chord_diagram</span> <span class="kn">import</span> <span class="n">chord_diagram</span>
+
+<span class="c1"># Local module with the optimization function</span>
+<span class="kn">from</span> <span class="nn">optimization</span> <span class="kn">import</span> <span class="n">multiobjective_optimization</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>  <span class="c1"># Suppress warnings for cleaner output</span>
+
+
+<div class="viewcode-block" id="parse_user_inputs">
+<a class="viewcode-back" href="../optimization.html#main_run.parse_user_inputs">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_user_inputs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define or parse user inputs for year, TRL filter, metric, and fix_2030_results toggle.</span>
+
+<span class="sd">    :return: A tuple containing:</span>
+<span class="sd">        - **yr** (*int*): Year to analyze (e.g., 2030 or 2050).</span>
+<span class="sd">        - **trl** (*bool*): True if &#39;High TRL&#39; data should be used.</span>
+<span class="sd">        - **metric** (*str*): The name of the metric to optimize (e.g., &#39;ghg_emissions&#39;).</span>
+<span class="sd">        - **fix_2030_results** (*bool*): Whether to fix certain flows/variables to a 2030 reference solution.</span>
+<span class="sd">    :rtype: tuple[int, bool, str, bool]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Hard-coded inputs here; could be replaced with arg parsing</span>
+    <span class="n">yr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2030</span><span class="p">,</span><span class="mi">2050</span><span class="p">]</span>  <span class="c1"># Note: if multiple years are provided, the first element is used for folder naming.</span>
+    <span class="n">trl</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># High TRL if year == 2030 (this may need adjustment if yr is a list)</span>
+    <span class="n">metric_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ghg_emissions&quot;</span><span class="p">,</span> <span class="s2">&quot;price_total&quot;</span><span class="p">,</span> <span class="s2">&quot;human_toxicity&quot;</span><span class="p">]</span>  <span class="c1"># Similar note as above.</span>
+    <span class="n">fix_2030_results</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">yr</span><span class="p">,</span> <span class="n">trl</span><span class="p">,</span> <span class="n">metric_list</span><span class="p">,</span> <span class="n">fix_2030_results</span></div>
+
+
+
+<div class="viewcode-block" id="run_optimization">
+<a class="viewcode-back" href="../optimization.html#main_run.run_optimization">[docs]</a>
+<span class="k">def</span> <span class="nf">run_optimization</span><span class="p">(</span><span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trl</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">fix_2030_results</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the multiobjective_optimization function and return the resulting DataFrames.</span>
+
+<span class="sd">    :param yr: The target year for constraints (e.g., 2030 or 2050).</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :param trl: Whether to filter for high TRL only.</span>
+<span class="sd">    :type trl: bool</span>
+<span class="sd">    :param fix_2030_results: Whether to constrain flows based on 2030 data.</span>
+<span class="sd">    :type fix_2030_results: bool</span>
+<span class="sd">    :param metric: The metric to optimize.</span>
+<span class="sd">    :type metric: str</span>
+<span class="sd">    :return: A tuple containing:</span>
+<span class="sd">        - **eq_df** (*pd.DataFrame*): Detailed optimization results at equation-level.</span>
+<span class="sd">        - **feed_df** (*pd.DataFrame*): Aggregated feedstock usage data.</span>
+<span class="sd">        - **prod_df** (*pd.DataFrame*): Aggregated product flow data (including co-products).</span>
+<span class="sd">    :rtype: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eq_df</span><span class="p">,</span> <span class="n">feed_df</span><span class="p">,</span> <span class="n">prod_df</span> <span class="o">=</span> <span class="n">multiobjective_optimization</span><span class="p">(</span>
+        <span class="n">constrained_metric</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">metric</span><span class="p">],</span>
+        <span class="n">yr</span><span class="o">=</span><span class="n">yr</span><span class="p">,</span>
+        <span class="n">trl</span><span class="o">=</span><span class="n">trl</span><span class="p">,</span>
+        <span class="n">fix_2030_results</span><span class="o">=</span><span class="n">fix_2030_results</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">eq_df</span><span class="p">,</span> <span class="n">feed_df</span><span class="p">,</span> <span class="n">prod_df</span></div>
+
+
+
+<div class="viewcode-block" id="merge_feedstock_availability">
+<a class="viewcode-back" href="../optimization.html#main_run.merge_feedstock_availability">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_feedstock_availability</span><span class="p">(</span><span class="n">feed_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge the feedstock usage with its availability for the given year, compute the remaining</span>
+<span class="sd">    availability, and sort the results in descending order of usage.</span>
+
+<span class="sd">    :param feed_df: Feedstock usage dataframe from the optimization.</span>
+<span class="sd">    :type feed_df: pd.DataFrame</span>
+<span class="sd">    :param yr: The year used for selecting the correct availability column.</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :return: A tuple containing:</span>
+<span class="sd">        - **feed_df_merged** (*pd.DataFrame*): The merged dataframe with additional columns:</span>
+<span class="sd">          [&#39;Availability {yr} (MMT)&#39;] and &#39;Difference&#39;.</span>
+<span class="sd">        - **feedstock_avail** (*pd.DataFrame*): The feedstock availability dataframe.</span>
+<span class="sd">    :rtype: tuple[pd.DataFrame, pd.DataFrame]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load feedstock availability</span>
+    <span class="n">feedstock</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;feedstock_limits.csv&#39;</span><span class="p">)</span>
+    <span class="n">feedstock_avail</span> <span class="o">=</span> <span class="n">feedstock</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Merge and compute difference</span>
+    <span class="n">feed_df_merged</span> <span class="o">=</span> <span class="n">feed_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">feedstock_avail</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;Feedstock&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">feed_df_merged</span><span class="p">[</span><span class="s1">&#39;Difference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">feed_df_merged</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">feed_df_merged</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">feed_df_merged</span> <span class="o">=</span> <span class="n">feed_df_merged</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">feed_df_merged</span><span class="p">,</span> <span class="n">feedstock_avail</span></div>
+
+
+
+<div class="viewcode-block" id="plot_feedstock_bars">
+<a class="viewcode-back" href="../optimization.html#main_run.plot_feedstock_bars">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_feedstock_bars</span><span class="p">(</span><span class="n">feed_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a stacked horizontal bar chart of feedstock usage versus availability.</span>
+
+<span class="sd">    :param feed_df: DataFrame with columns [&#39;Feedstock_flow&#39;, f&#39;Availability {yr} (MMT)&#39;, &#39;Feedstock&#39;].</span>
+<span class="sd">    :type feed_df: pd.DataFrame</span>
+<span class="sd">    :param yr: The target year (for labeling).</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :param output_folder: Path to the folder where the output files will be saved.</span>
+<span class="sd">    :type output_folder: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=-</span><span class="n">feed_df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">feed_df</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Available&#39;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">feed_df</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">feed_df</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Used&#39;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feedstock Usage vs. Availability (</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Quantity (MMT)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Feedstock&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="c1"># plt.show()</span>
+    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;tornado_plot.pdf&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_chord_diagram">
+<a class="viewcode-back" href="../optimization.html#main_run.create_chord_diagram">[docs]</a>
+<span class="k">def</span> <span class="nf">create_chord_diagram</span><span class="p">(</span><span class="n">eq_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">feed_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build and display a chord diagram illustrating the flow from feedstock to chemicals.</span>
+
+<span class="sd">    :param eq_df: DataFrame that must include the columns [&#39;Feedstock&#39;, &#39;Chemical&#39;, &#39;Feedstock_flow&#39;].</span>
+<span class="sd">    :type eq_df: pd.DataFrame</span>
+<span class="sd">    :param feed_df: DataFrame used to determine main feedstocks.</span>
+<span class="sd">    :type feed_df: pd.DataFrame</span>
+<span class="sd">    :param yr: The target year, used only for naming or in the figure title if desired.</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :param output_folder: Path to the folder where the output files will be saved.</span>
+<span class="sd">    :type output_folder: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">network_df</span> <span class="o">=</span> <span class="n">eq_df</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">network_df</span> <span class="o">=</span> <span class="n">network_df</span><span class="p">[</span><span class="n">network_df</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1E-10</span><span class="p">]</span>  <span class="c1"># Filter negligible flows</span>
+
+    <span class="n">main_feedstocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feed_df</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]))</span>
+    <span class="n">tertiary_feedstocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">eq_df</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]))</span>
+
+    <span class="c1"># Build a combined sorted list of unique feedstocks and chemicals</span>
+    <span class="n">feedstocks</span> <span class="o">=</span> <span class="n">network_df</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">chemicals</span> <span class="o">=</span> <span class="n">network_df</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">feedstocks</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">chemicals</span><span class="p">))</span>
+
+    <span class="c1"># Create a square adjacency matrix</span>
+    <span class="n">flow_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">combined</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">combined</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">network_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">flow_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+
+    <span class="n">flow_array</span> <span class="o">=</span> <span class="n">flow_df</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="c1"># Generate three color lists from different colormaps</span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="mi">43</span>  <span class="c1"># 41-color list using viridis</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># 10-color list using reds</span>
+    <span class="n">n3</span> <span class="o">=</span> <span class="mi">9</span>   <span class="c1"># 9-color list using blues</span>
+
+    <span class="n">colors_list1</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">n1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n1</span><span class="p">)]</span>
+    <span class="n">colors_list2</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Reds</span><span class="p">(</span><span class="mf">0.3</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">n2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n2</span><span class="p">)]</span>
+    <span class="n">colors_list3</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">(</span><span class="mf">0.3</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">n3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n3</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">rgba_to_hex</span><span class="p">(</span><span class="n">rgba</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert an RGBA tuple (with floats in the range [0,1]) to a hexadecimal color string.</span>
+
+<span class="sd">        :param rgba: A tuple representing an RGBA color.</span>
+<span class="sd">        :type rgba: tuple</span>
+<span class="sd">        :return: The hexadecimal color string.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;#</span><span class="si">{:02x}{:02x}{:02x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">rgba</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">rgba</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">rgba</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">hex_colors_list1</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgba_to_hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors_list1</span><span class="p">]</span>
+    <span class="n">hex_colors_list2</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgba_to_hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors_list2</span><span class="p">]</span>
+    <span class="n">hex_colors_list3</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgba_to_hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors_list3</span><span class="p">]</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">combined</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">main_feedstocks</span><span class="p">:</span>
+            <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hex_colors_list3</span><span class="p">[</span><span class="n">c1</span><span class="p">])</span>
+            <span class="n">c1</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="n">tertiary_feedstocks</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">r</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">main_feedstocks</span><span class="p">):</span>
+            <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hex_colors_list2</span><span class="p">[</span><span class="n">c2</span><span class="p">])</span>
+            <span class="n">c2</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hex_colors_list1</span><span class="p">[</span><span class="n">c3</span><span class="p">])</span>
+            <span class="n">c3</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Arial&quot;</span>
+
+    <span class="n">chord_diagram</span><span class="p">(</span>
+        <span class="n">flow_array</span><span class="p">,</span>
+        <span class="n">combined</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+        <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span>
+        <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">rotate_names</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+        <span class="n">use_gradient</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="c1"># plt.show()</span>
+    <span class="n">chord_pdf_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;chord_diagram.pdf&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">chord_pdf_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_sankey_feedstocks">
+<a class="viewcode-back" href="../optimization.html#main_run.create_sankey_feedstocks">[docs]</a>
+<span class="k">def</span> <span class="nf">create_sankey_feedstocks</span><span class="p">(</span><span class="n">eq_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">html_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a Sankey diagram showing multi-use feedstocks flowing to chemicals,</span>
+<span class="sd">    excluding flows that are 100% dedicated to one chemical.</span>
+
+<span class="sd">    :param eq_df: DataFrame that must contain columns:</span>
+<span class="sd">                  [&#39;Feedstock_flow&#39;, &#39;Chemical&#39;, &#39;Feedstock&#39;, &#39;Long name&#39;] for flow details.</span>
+<span class="sd">    :type eq_df: pd.DataFrame</span>
+<span class="sd">    :param html_filename: File path (including folder) to save the resulting Sankey diagram as an HTML file.</span>
+<span class="sd">    :type html_filename: str</span>
+<span class="sd">    :param output_folder: Path to the folder where CSV outputs will be saved.</span>
+<span class="sd">    :type output_folder: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">eq_df</span><span class="p">[[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Long name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">total_flow</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Chemical&#39;</span><span class="p">)[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">total_flow</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;_x&#39;</span><span class="p">,</span> <span class="s1">&#39;_y&#39;</span><span class="p">))</span>
+    <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow_x&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow_y&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">100</span><span class="p">]</span>
+
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;feedstock_multiuse.csv&#39;</span><span class="p">)</span>
+    <span class="n">merged</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">feedstock_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]))</span>
+    <span class="n">chemical_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]))</span>
+    <span class="n">all_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">feedstock_list</span> <span class="o">+</span> <span class="n">chemical_list</span><span class="p">))</span>
+
+    <span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_nodes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]]</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_nodes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]]</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">link_labels</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Long name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
+    <span class="n">rgba_colors</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;rgba(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, 0.4)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">merged</span><span class="p">)))</span>
+    <span class="p">]</span>
+
+    <span class="n">link_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">link_labels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">rgba_colors</span><span class="p">)</span>
+    <span class="n">node_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">all_nodes</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">rgba_colors</span><span class="p">)</span>
+
+    <span class="n">sankey_data</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Sankey</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node_data</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="n">link_data</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">sankey_data</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Sankey Diagram: Feedstock → Chemical (Multi-Use Feedstocks Only)&quot;</span><span class="p">,</span>
+        <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># fig.show()</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">html_filename</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_sankey_pathways">
+<a class="viewcode-back" href="../optimization.html#main_run.create_sankey_pathways">[docs]</a>
+<span class="k">def</span> <span class="nf">create_sankey_pathways</span><span class="p">(</span><span class="n">eq_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">html_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a Sankey diagram showing multi-use pathways flowing to chemicals,</span>
+<span class="sd">    excluding flows that are 100% dedicated to one chemical.</span>
+
+<span class="sd">    :param eq_df: DataFrame that must contain columns:</span>
+<span class="sd">                  [&#39;product_flow&#39;, &#39;Chemical&#39;, &#39;Long name&#39;] for flow details.</span>
+<span class="sd">    :type eq_df: pd.DataFrame</span>
+<span class="sd">    :param html_filename: File path (including folder) to save the resulting Sankey diagram as an HTML file.</span>
+<span class="sd">    :type html_filename: str</span>
+<span class="sd">    :param output_folder: Path to the folder where CSV outputs will be saved.</span>
+<span class="sd">    :type output_folder: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">eq_df</span><span class="p">[[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="s1">&#39;Long name&#39;</span><span class="p">,</span> <span class="s1">&#39;product_flow&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">total_flow</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Chemical&#39;</span><span class="p">)[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">total_flow</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;_x&#39;</span><span class="p">,</span> <span class="s1">&#39;_y&#39;</span><span class="p">))</span>
+    <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;product_flow_x&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;product_flow_y&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">100</span><span class="p">]</span>
+    <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Long name&#39;</span><span class="p">]</span>
+
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;pathways_multiuse.csv&#39;</span><span class="p">)</span>
+    <span class="n">merged</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">source_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]))</span>
+    <span class="n">target_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]))</span>
+    <span class="n">all_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">source_list</span> <span class="o">+</span> <span class="n">target_list</span><span class="p">))</span>
+
+    <span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_nodes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]]</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_nodes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]]</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;percent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">link_labels</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Long name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
+    <span class="n">rgba_colors</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;rgba(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, 0.4)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">merged</span><span class="p">)))</span>
+    <span class="p">]</span>
+
+    <span class="n">link_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">link_labels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">rgba_colors</span><span class="p">)</span>
+    <span class="n">node_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">all_nodes</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">rgba_colors</span><span class="p">)</span>
+
+    <span class="n">sankey_data</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Sankey</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node_data</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="n">link_data</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">sankey_data</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Sankey Diagram: Pathways → Chemical (Multi-Use Pathways Only)&quot;</span><span class="p">,</span>
+        <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># fig.show()</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">html_filename</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../optimization.html#main_run.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function tying the whole workflow together.</span>
+
+<span class="sd">    The workflow includes:</span>
+<span class="sd">    </span>
+<span class="sd">    1. Parsing user inputs.</span>
+<span class="sd">    2. Running the optimization.</span>
+<span class="sd">    3. Analyzing feedstock usage by merging with availability.</span>
+<span class="sd">    4. Plotting the feedstock usage bar chart.</span>
+<span class="sd">    5. Creating the chord diagram.</span>
+<span class="sd">    6. Generating Sankey diagrams for feedstock and pathway flows.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. User inputs</span>
+    <span class="n">yr</span><span class="p">,</span> <span class="n">trl</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">fix_2030_results</span> <span class="o">=</span> <span class="n">parse_user_inputs</span><span class="p">()</span>
+
+    <span class="c1"># If the inputs are lists, use the first element for folder naming.</span>
+    <span class="c1"># Loop through every year and metric combination</span>
+    <span class="k">for</span> <span class="n">yr_val</span> <span class="ow">in</span> <span class="n">yr</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">metric_val</span> <span class="ow">in</span> <span class="n">metric</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">yr_val</span> <span class="o">==</span> <span class="mi">2030</span><span class="p">):</span>
+                <span class="n">trl</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">trl</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Create output folder with a name that includes metric, year, and fix_2030_results flag.</span>
+            <span class="n">output_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;results_</span><span class="si">{</span><span class="n">metric_val</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">yr_val</span><span class="si">}</span><span class="s2">_fix2030_</span><span class="si">{</span><span class="n">fix_2030_results</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># 2. Optimization</span>
+            <span class="k">if</span> <span class="n">fix_2030_results</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">yr_val</span> <span class="o">==</span> <span class="mi">2050</span> <span class="ow">and</span> <span class="n">trl</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="c1"># Saving the pickle file</span>
+                <span class="n">run_optimization</span><span class="p">(</span><span class="mi">2030</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">metric_val</span><span class="p">)</span>
+
+            <span class="n">eq_df</span><span class="p">,</span> <span class="n">feed_df</span><span class="p">,</span> <span class="n">prod_df</span> <span class="o">=</span> <span class="n">run_optimization</span><span class="p">(</span><span class="n">yr_val</span><span class="p">,</span> <span class="n">trl</span><span class="p">,</span> <span class="n">fix_2030_results</span><span class="p">,</span> <span class="n">metric_val</span><span class="p">)</span>
+
+            <span class="c1"># 3. Merge feedstock usage with availability</span>
+            <span class="n">feed_df_merged</span><span class="p">,</span> <span class="n">feedstock_availability</span> <span class="o">=</span> <span class="n">merge_feedstock_availability</span><span class="p">(</span><span class="n">feed_df</span><span class="p">,</span> <span class="n">yr_val</span><span class="p">)</span>
+
+            <span class="c1"># 4. Plot feedstock usage</span>
+            <span class="n">plot_feedstock_bars</span><span class="p">(</span><span class="n">feed_df_merged</span><span class="p">,</span> <span class="n">yr_val</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">)</span>
+
+            <span class="c1"># 5. Chord diagram: feedstock → chemical</span>
+            <span class="n">create_chord_diagram</span><span class="p">(</span><span class="n">eq_df</span><span class="p">,</span> <span class="n">feedstock_availability</span><span class="p">,</span> <span class="n">yr_val</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">)</span>
+
+            <span class="c1"># 6. Sankey diagrams:</span>
+            <span class="c1">#    (a) Feedstock → Chemical</span>
+            <span class="n">sankey_feedstocks_html</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s2">&quot;sankey-diagram-plotly-real_feedstock.html&quot;</span><span class="p">)</span>
+            <span class="n">create_sankey_feedstocks</span><span class="p">(</span><span class="n">eq_df</span><span class="p">,</span> <span class="n">sankey_feedstocks_html</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">)</span>
+
+            <span class="c1">#    (b) Pathways → Chemical</span>
+            <span class="n">sankey_pathways_html</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s2">&quot;sankey-diagram-plotly-real_pathways.html&quot;</span><span class="p">)</span>
+            <span class="n">create_sankey_pathways</span><span class="p">(</span><span class="n">eq_df</span><span class="p">,</span> <span class="n">sankey_pathways_html</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All steps completed successfully.&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

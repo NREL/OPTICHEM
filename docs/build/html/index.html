@@ -1,0 +1,195 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chemicals_Pathway_Optimizer documentation &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pareto.html">Pareto Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Chemicals_Pathway_Optimizer documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chemicals-pathway-optimizer-documentation">
+<h1>Chemicals_Pathway_Optimizer documentation<a class="headerlink" href="#chemicals-pathway-optimizer-documentation" title="Link to this heading"></a></h1>
+<p>Welcome to the Multi-Objective Optimization project documentation! This project includes
+scripts for performing multi-objective optimization, post-optimization analysis, and Pareto
+front visualizations. This project contains two main Python modules that work together to perform multi-objective optimization of feedstock usage and post-optimization analysis. The outputs from both modules (e.g., CSV files, PDF diagrams, HTML reports, and pickle files) are automatically saved in dedicated output folders. The folder names include key parameters such as the optimization metric, target year, and whether 2030 results are fixed.</p>
+<p>This project is designed to:</p>
+<ol class="arabic simple">
+<li><p><strong>Perform multi-objective optimization:</strong>
+The optimization module uses Pyomo to model feedstock constraints, product demand, and co-product relationships. Multiple metrics (e.g., greenhouse gas emissions, price, human toxicity) can be optimized individually.</p></li>
+<li><p><strong>Conduct post-optimization analysis:</strong>
+After running the optimization, the analysis module merges the optimization results with feedstock availability, generates visualizations (bar charts, chord diagrams, Sankey diagrams), and saves the outputs.</p></li>
+<li><p><strong>Automate output management:</strong>
+Both modules automatically create output folders whose names include the metric, target year, and a flag indicating if 2030 results are fixed. This makes it easier to track and organize the generated results.</p></li>
+</ol>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_run.html">Main Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#post-optimization-analysis-script">Post-Optimization Analysis Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.create_chord_diagram"><code class="docutils literal notranslate"><span class="pre">create_chord_diagram()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.create_sankey_feedstocks"><code class="docutils literal notranslate"><span class="pre">create_sankey_feedstocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.create_sankey_pathways"><code class="docutils literal notranslate"><span class="pre">create_sankey_pathways()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.merge_feedstock_availability"><code class="docutils literal notranslate"><span class="pre">merge_feedstock_availability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.parse_user_inputs"><code class="docutils literal notranslate"><span class="pre">parse_user_inputs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.plot_feedstock_bars"><code class="docutils literal notranslate"><span class="pre">plot_feedstock_bars()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_run.html#main_run.run_optimization"><code class="docutils literal notranslate"><span class="pre">run_optimization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Main Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#post-optimization-analysis-script">Post-Optimization Analysis Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.create_chord_diagram"><code class="docutils literal notranslate"><span class="pre">create_chord_diagram()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.create_sankey_feedstocks"><code class="docutils literal notranslate"><span class="pre">create_sankey_feedstocks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.create_sankey_pathways"><code class="docutils literal notranslate"><span class="pre">create_sankey_pathways()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.merge_feedstock_availability"><code class="docutils literal notranslate"><span class="pre">merge_feedstock_availability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.parse_user_inputs"><code class="docutils literal notranslate"><span class="pre">parse_user_inputs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.plot_feedstock_bars"><code class="docutils literal notranslate"><span class="pre">plot_feedstock_bars()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main_run.run_optimization"><code class="docutils literal notranslate"><span class="pre">run_optimization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pareto.html">Pareto Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.build_co_product_dictionary"><code class="docutils literal notranslate"><span class="pre">build_co_product_dictionary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.build_equation_dataframe"><code class="docutils literal notranslate"><span class="pre">build_equation_dataframe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.create_metrics"><code class="docutils literal notranslate"><span class="pre">create_metrics()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.load_and_filter_data"><code class="docutils literal notranslate"><span class="pre">load_and_filter_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.load_constraint_data"><code class="docutils literal notranslate"><span class="pre">load_constraint_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.multiobjective_optimization"><code class="docutils literal notranslate"><span class="pre">multiobjective_optimization()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.product_dataframe_editor"><code class="docutils literal notranslate"><span class="pre">product_dataframe_editor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.reduce_extra_production"><code class="docutils literal notranslate"><span class="pre">reduce_extra_production()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pareto.html#pareto.sum_co_products"><code class="docutils literal notranslate"><span class="pre">sum_co_products()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2030.html#pareto-optimization-plotting-module-2030">Pareto Optimization Plotting Module 2030</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2030.html#run_multiobjective_2030.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2030.html#run_multiobjective_2030.main2"><code class="docutils literal notranslate"><span class="pre">main2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2050.html#pareto-optimization-plotting-module-for-year-2050">Pareto Optimization Plotting Module for Year 2050</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2050.html#run_multiobjective_2050.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_multiobjective_2050.html#run_multiobjective_2050.main2"><code class="docutils literal notranslate"><span class="pre">main2()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

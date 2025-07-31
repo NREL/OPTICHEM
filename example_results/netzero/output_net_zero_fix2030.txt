@@ -1,0 +1,31 @@
+
+price_total2030-True-False
+Optimal Solution for metric: price_total
+Objective value = 176.93428650444415
+Total excess flow:  9.08994879367242e-08
+
+Values of other metrics:
+price_total  176.93428650444412
+ghg_emissions  4.618527782440651e-14
+human_toxicity  426.3401438525303
+water_depletion  11.731978298456601
+fossil_fuel_depletion  104.37038622260091
+land_use  149149.38413325936
+electricity_use  865.2163598724273
+hydrogen_use  14.360565333609873
+
+price_total2050-False-True
+Optimal Solution for metric: price_total
+Objective value = 214.80370335502127
+Total excess flow:  0.36379692400039687
+
+Values of other metrics:
+price_total  214.80370335502127
+ghg_emissions  9.059419880941277e-14
+human_toxicity  495.79725709486894
+water_depletion  12.940263740472393
+fossil_fuel_depletion  146.1322784903104
+land_use  188429.52036394482
+electricity_use  1005.8843726930727
+hydrogen_use  13.990012818375225
+All steps completed successfully.

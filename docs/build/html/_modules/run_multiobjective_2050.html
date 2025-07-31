@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>run_multiobjective_2050 &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimization.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pareto.html">Pareto Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">run_multiobjective_2050</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for run_multiobjective_2050</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Pareto Optimization Plotting Module for Year 2050</span>
+<span class="sd">=================================================</span>
+
+<span class="sd">This module performs Pareto optimization experiments by calling the </span>
+<span class="sd">:func:`pareto.multiobjective_optimization` function. It runs two experiments:</span>
+<span class="sd">one exploring the trade-off between GHG emissions (as a constraint) and price,</span>
+<span class="sd">and another exploring the trade-off between human toxicity (as a constraint)</span>
+<span class="sd">and GHG emissions.</span>
+
+<span class="sd">The results are aggregated over multiple iterations and visualized using scatter plots,</span>
+<span class="sd">which are saved as publication-quality PNG files.</span>
+
+<span class="sd">:author: tghosh</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pareto</span> <span class="kn">import</span> <span class="n">multiobjective_optimization</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2050</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">yr</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+    <span class="n">high_trl</span> <span class="o">=</span> <span class="p">(</span><span class="n">yr</span> <span class="o">==</span> <span class="mi">2030</span><span class="p">)</span>
+    <span class="n">fix_2030_results</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../run_multiobjective_2050.html#run_multiobjective_2050.main">[docs]</a>
+    <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Pareto optimization for the case where GHG emissions is constrained</span>
+<span class="sd">        and price is optimized.</span>
+
+<span class="sd">        This function sets optimization parameters for a GHG emissions constraint,</span>
+<span class="sd">        iteratively calls :func:`pareto.multiobjective_optimization` while decreasing</span>
+<span class="sd">        the constraint value, aggregates the resulting objective values, and produces a</span>
+<span class="sd">        scatter plot of the Pareto front (GHG Emissions vs. Price Total). The plot is saved</span>
+<span class="sd">        as a PNG file in the designated output folder.</span>
+
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parameters and settings</span>
+        <span class="n">constrained_ghg_metric</span> <span class="o">=</span> <span class="s2">&quot;ghg_emissions&quot;</span>
+        <span class="n">optimized_metric</span> <span class="o">=</span> <span class="s2">&quot;price_total&quot;</span>
+        
+        <span class="n">ghg_upper_bounds</span> <span class="o">=</span> <span class="mf">105.820</span>
+        <span class="n">ghg_lower_bounds</span> <span class="o">=</span> <span class="o">-</span><span class="mf">390.66</span>
+        <span class="n">constrained_ghg_metric_val</span> <span class="o">=</span> <span class="n">ghg_upper_bounds</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mf">4.9655</span>
+    
+        <span class="c1"># Initialize lists to store results</span>
+        <span class="n">ghg_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">price_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">human_tox</span> <span class="o">=</span> <span class="p">[]</span>
+    
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./pareto_results_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">_fix2030_</span><span class="si">{</span><span class="n">fix_2030_results</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># Single iteration (adjust the loop range if more iterations are needed)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimizing </span><span class="si">{</span><span class="n">constrained_ghg_metric</span><span class="si">}</span><span class="s2"> with constraint value: </span><span class="si">{</span><span class="n">constrained_ghg_metric_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Multiobjective optimization call</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">multiobjective_optimization</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">constrained_ghg_metric</span><span class="p">,</span> <span class="n">constrained_ghg_metric_val</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">optimized_metric</span><span class="p">],</span>
+                <span class="n">yr</span><span class="p">,</span>
+                <span class="n">high_trl</span><span class="p">,</span>
+                <span class="n">fix_2030_results</span>
+            <span class="p">)</span>
+            <span class="c1"># Adjust the constraint for subsequent iterations if applicable</span>
+            <span class="n">constrained_ghg_metric_val</span> <span class="o">-=</span> <span class="n">count</span>
+    
+            <span class="c1"># Sum the values and store in lists</span>
+            <span class="n">ghg_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;ghg_emissions&#39;</span><span class="p">]))</span>
+            <span class="n">price_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;price_total&#39;</span><span class="p">]))</span>
+            <span class="n">human_tox</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;human_toxicity&#39;</span><span class="p">]))</span>
+    
+        <span class="c1"># Create a DataFrame with results</span>
+        <span class="n">multi_objective_result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;GHG Emissions&#39;</span><span class="p">:</span> <span class="n">ghg_value</span><span class="p">,</span>
+            <span class="s1">&#39;Price Total&#39;</span><span class="p">:</span> <span class="n">price_value</span><span class="p">,</span>
+            <span class="s1">&#39;Human Toxicity&#39;</span><span class="p">:</span> <span class="n">human_tox</span>
+        <span class="p">})</span>
+    
+        <span class="c1"># Plotting improvements for publication</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;paper&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Arial&quot;</span>
+        <span class="c1"># Create a scatterplot with enhanced aesthetics</span>
+        <span class="n">scatter_plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">multi_objective_result_df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s1">&#39;GHG Emissions&#39;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Price Total&#39;</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;Human Toxicity&#39;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>           <span class="c1"># Marker size</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span>
+        <span class="p">)</span>
+    
+        <span class="c1"># Set axis labels and title with improved formatting</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Total GHG Emissions &quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Total Price &quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pareto Front: GHG Emissions vs Price </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    
+        <span class="c1"># Customize legend for clarity</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Toxicity&quot;</span><span class="p">,</span> <span class="n">title_fontsize</span><span class="o">=</span><span class="s1">&#39;13&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;11&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+    
+        <span class="c1"># Adjust layout and save the figure with publication-quality resolution</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/pareto_front GHG Emissions vs Price </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span></div>
+
+        <span class="c1"># plt.show()</span>
+    
+    <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+    
+    <span class="c1">#%%</span>
+
+<div class="viewcode-block" id="main2">
+<a class="viewcode-back" href="../run_multiobjective_2050.html#run_multiobjective_2050.main2">[docs]</a>
+    <span class="k">def</span> <span class="nf">main2</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Pareto optimization for the case where human toxicity is constrained</span>
+<span class="sd">        and GHG emissions is optimized.</span>
+
+<span class="sd">        This function sets optimization parameters for a human toxicity constraint,</span>
+<span class="sd">        iteratively calls :func:`pareto.multiobjective_optimization` while decreasing</span>
+<span class="sd">        the constraint value, aggregates the resulting objective values, and produces a</span>
+<span class="sd">        scatter plot of the Pareto front (Human Toxicity vs. GHG Emissions). The plot is</span>
+<span class="sd">        saved as a PNG file in the designated output folder.</span>
+
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parameters and settings</span>
+        <span class="n">constrained_ht_metric</span> <span class="o">=</span> <span class="s2">&quot;human_toxicity&quot;</span>
+        <span class="n">optimized_metric</span> <span class="o">=</span> <span class="s2">&quot;ghg_emissions&quot;</span>
+        
+        <span class="n">ht_upper_bounds</span> <span class="o">=</span> <span class="mf">518.068</span>
+        <span class="n">ht_lower_bounds</span> <span class="o">=</span> <span class="mf">175.145</span>
+        <span class="n">constrained_ht_metric_val</span> <span class="o">=</span> <span class="n">ht_upper_bounds</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mf">3.429</span>
+    
+        <span class="c1"># Initialize lists to store results</span>
+        <span class="n">ghg_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">price_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">human_tox</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./pareto_results_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">_fix2030_</span><span class="si">{</span><span class="n">fix_2030_results</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+        <span class="c1"># Single iteration (adjust the loop range if more iterations are needed)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimizing </span><span class="si">{</span><span class="n">constrained_ht_metric</span><span class="si">}</span><span class="s2"> with constraint value: </span><span class="si">{</span><span class="n">constrained_ht_metric_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Multiobjective optimization call</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">multiobjective_optimization</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">constrained_ht_metric</span><span class="p">,</span> <span class="n">constrained_ht_metric_val</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">optimized_metric</span><span class="p">],</span>
+                <span class="n">yr</span><span class="p">,</span>
+                <span class="n">high_trl</span><span class="p">,</span>
+                <span class="n">fix_2030_results</span>
+            <span class="p">)</span>
+            <span class="c1"># Adjust the constraint for subsequent iterations if applicable</span>
+            <span class="n">constrained_ht_metric_val</span> <span class="o">-=</span> <span class="n">count</span>
+    
+            <span class="c1"># Sum the values and store in lists</span>
+            <span class="n">ghg_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;ghg_emissions&#39;</span><span class="p">]))</span>
+            <span class="n">price_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;price_total&#39;</span><span class="p">]))</span>
+            <span class="n">human_tox</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;human_toxicity&#39;</span><span class="p">]))</span>
+    
+        <span class="c1"># Create a DataFrame with results</span>
+        <span class="n">multi_objective_result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;GHG Emissions&#39;</span><span class="p">:</span> <span class="n">ghg_value</span><span class="p">,</span>
+            <span class="s1">&#39;Price Total&#39;</span><span class="p">:</span> <span class="n">price_value</span><span class="p">,</span>
+            <span class="s1">&#39;Human Toxicity&#39;</span><span class="p">:</span> <span class="n">human_tox</span>
+        <span class="p">})</span>
+    
+        <span class="c1"># Plotting improvements for publication</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;paper&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Arial&quot;</span>
+        <span class="c1"># Create a scatterplot with enhanced aesthetics</span>
+        <span class="n">scatter_plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">multi_objective_result_df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Human Toxicity&#39;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s1">&#39;GHG Emissions&#39;</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;Price Total&#39;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>           <span class="c1"># Marker size</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span>
+        <span class="p">)</span>
+    
+        <span class="c1"># Set axis labels and title with improved formatting</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Total Human Toxicity &quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Total GHG Emissions &quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pareto Front: Human Toxicity vs GHG Emissions </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    
+        <span class="c1"># Customize legend for clarity</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Price Total&quot;</span><span class="p">,</span> <span class="n">title_fontsize</span><span class="o">=</span><span class="s1">&#39;13&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;11&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+    
+        <span class="c1"># Adjust layout and save the figure with publication-quality resolution</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/pareto_Human Toxicity vs GHG_Totals </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span></div>
+
+        <span class="c1"># plt.show()</span>
+    
+    <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+        <span class="n">main2</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

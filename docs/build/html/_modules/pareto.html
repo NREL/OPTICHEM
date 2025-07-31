@@ -1,0 +1,812 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pareto &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimization.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pareto.html">Pareto Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pareto</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pareto</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Mar 13 10:22:35 2025</span>
+
+<span class="sd">:author: tghosh</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># --------------------------------------------------------------</span>
+<span class="c1"># Multi-Objective Optimization (Refactored)</span>
+<span class="c1"># --------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pyomo.environ</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConcreteModel</span><span class="p">,</span>
+    <span class="n">Set</span><span class="p">,</span>
+    <span class="n">Var</span><span class="p">,</span>
+    <span class="n">NonNegativeReals</span><span class="p">,</span>
+    <span class="n">ConstraintList</span><span class="p">,</span>
+    <span class="n">Objective</span><span class="p">,</span>
+    <span class="n">minimize</span><span class="p">,</span>
+    <span class="n">SolverFactory</span>
+<span class="p">)</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>  <span class="c1"># Suppress warning messages for clarity</span>
+
+
+<div class="viewcode-block" id="load_and_filter_data">
+<a class="viewcode-back" href="../pareto.html#pareto.load_and_filter_data">[docs]</a>
+<span class="k">def</span> <span class="nf">load_and_filter_data</span><span class="p">(</span><span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trl</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the main &#39;full_data.csv&#39; dataset and filter it if TRL is True.</span>
+
+<span class="sd">    :param yr: The target year (not used for filtering in the current implementation).</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :param trl: Boolean flag indicating whether to filter for high TRL data.</span>
+<span class="sd">    :type trl: bool</span>
+<span class="sd">    :return: A pandas DataFrame containing the loaded (and possibly filtered) data.</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;full_data.csv&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">trl</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;High TRL&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="sum_co_products">
+<a class="viewcode-back" href="../pareto.html#pareto.sum_co_products">[docs]</a>
+<span class="k">def</span> <span class="nf">sum_co_products</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjust feedstock usage based on co-product fractions.</span>
+
+<span class="sd">    This function computes the total product flow by summing co-product amounts</span>
+<span class="sd">    and adjusts the main product mass fraction, total feedstock inflow, and the</span>
+<span class="sd">    resulting product yield per unit feedstock.</span>
+
+<span class="sd">    :param df: DataFrame containing feedstock and co-product usage data.</span>
+<span class="sd">    :type df: pd.DataFrame</span>
+<span class="sd">    :return: The modified DataFrame with additional computed columns.</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Total product flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;Co-product 1 amount (MMT/MMT)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 2 amount (MMT/MMT)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 3 amount (MMT/MMT)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 4 amount (MMT/MMT)&#39;</span>
+        <span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;mass fraction of main poduct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Total product flow&#39;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total feedstock inflow for 1 MMT product&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Feedstock use (MMT/MMT)&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;mass fraction of main poduct&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;MMT product per 1 MMT feedstock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total feedstock inflow for 1 MMT product&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="load_constraint_data">
+<a class="viewcode-back" href="../pareto.html#pareto.load_constraint_data">[docs]</a>
+<span class="k">def</span> <span class="nf">load_constraint_data</span><span class="p">(</span><span class="n">yr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load additional constraint data for feedstock availability and product demand.</span>
+
+<span class="sd">    :param yr: The target year for which constraints are to be loaded.</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :return: A tuple where the first element is a DataFrame of feedstock limits and the</span>
+<span class="sd">             second is a DataFrame of product demand limits.</span>
+<span class="sd">    :rtype: tuple[pd.DataFrame, pd.DataFrame]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feedstock</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;feedstock_limits.csv&#39;</span><span class="p">)</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;product_limits.csv&#39;</span><span class="p">)</span>
+    <span class="n">feedstock2</span> <span class="o">=</span> <span class="n">feedstock</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]]</span>
+    <span class="n">product2</span> <span class="o">=</span> <span class="n">product</span><span class="p">[[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Demand by society </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">feedstock2</span><span class="p">,</span> <span class="n">product2</span></div>
+
+
+
+<div class="viewcode-block" id="build_co_product_dictionary">
+<a class="viewcode-back" href="../pareto.html#pareto.build_co_product_dictionary">[docs]</a>
+<span class="k">def</span> <span class="nf">build_co_product_dictionary</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a dictionary of co-product relationships from the data.</span>
+
+<span class="sd">    The dictionary keys are unique identifiers and the values are sorted lists of co-product names.</span>
+
+<span class="sd">    :param data: DataFrame containing production process data with co-product information.</span>
+<span class="sd">    :type data: pd.DataFrame</span>
+<span class="sd">    :return: A dictionary mapping unique process keys to a list of associated co-products.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_cp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]]</span>
+    <span class="n">data_cp</span> <span class="o">=</span> <span class="n">data_cp</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;Long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 1 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 2 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 3 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 4 long name&#39;</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">data_cp_dic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data_cp</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">columns_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;Co-product 1 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 2 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 3 long name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 4 long name&#39;</span>
+        <span class="p">]</span>
+        <span class="n">cp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Long name&#39;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">cn</span> <span class="ow">in</span> <span class="n">columns_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">cn</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="n">cn</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">cn</span><span class="p">])</span>
+        <span class="n">cp_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cp_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cp_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_cp_dic</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">data_cp_dic</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;Set&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp_list</span>
+
+    <span class="k">return</span> <span class="n">data_cp_dic</span></div>
+
+
+
+<div class="viewcode-block" id="build_equation_dataframe">
+<a class="viewcode-back" href="../pareto.html#pareto.build_equation_dataframe">[docs]</a>
+<span class="k">def</span> <span class="nf">build_equation_dataframe</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link model decision variables (x) to the underlying DataFrame for physical flows.</span>
+
+<span class="sd">    This function creates a DataFrame that connects each pathway (identified by its name)</span>
+<span class="sd">    with its corresponding Pyomo decision variable and then merges it with the original data.</span>
+<span class="sd">    It also computes derived metrics such as product flow, price, GHG emissions, and other impacts.</span>
+
+<span class="sd">    :param model: The Pyomo model containing the decision variables.</span>
+<span class="sd">    :param data: DataFrame with process data and associated parameters.</span>
+<span class="sd">    :type data: pd.DataFrame</span>
+<span class="sd">    :return: A DataFrame containing the linked variables and computed metrics.</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">variable_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pathway_list_var</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">M</span><span class="p">:</span>
+        <span class="n">variable_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">pathway_list_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="c1"># Construct a dataframe that links Pyomo Var objects to each pathway</span>
+    <span class="n">model_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">:</span> <span class="n">variable_list</span><span class="p">,</span>
+        <span class="s1">&#39;pathway&#39;</span><span class="p">:</span> <span class="n">pathway_list_var</span>
+    <span class="p">})</span>
+
+    <span class="c1"># Merge with original data</span>
+    <span class="n">equation_dataframe</span> <span class="o">=</span> <span class="n">model_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;pathway&#39;</span><span class="p">,</span>
+        <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;Long name&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Calculate product flow and various metrics</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;MMT product per 1 MMT feedstock&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;price_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Price (billion USD / MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;ghg_emissions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;GHG emissions (MMT CO2e/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;human_toxicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Human toxicity (MMT 1,4-DCB eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;electricity_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Electricity use (TWh/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;hydrogen_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Hydrogen use (MMT/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;fossil_fuel_depletion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Fossil fuel depletion (MMT oil eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;land_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Land use (km2*a crop eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;water_depletion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;Water depletion (km3/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>  
+    <span class="k">return</span> <span class="n">equation_dataframe</span></div>
+
+
+
+<div class="viewcode-block" id="product_dataframe_editor">
+<a class="viewcode-back" href="../pareto.html#pareto.product_dataframe_editor">[docs]</a>
+<span class="k">def</span> <span class="nf">product_dataframe_editor</span><span class="p">(</span>
+    <span class="n">product_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">equation_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">main_product_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjust the product DataFrame to account for intermediate feedstocks that are also products</span>
+<span class="sd">    in a previous step (negative flow represents consumption).</span>
+
+<span class="sd">    :param product_df: DataFrame containing product flow data.</span>
+<span class="sd">    :param equation_df: DataFrame linking process pathways with model variables.</span>
+<span class="sd">    :param main_product_df: DataFrame that flags main-product processes.</span>
+<span class="sd">    :type product_df: pd.DataFrame</span>
+<span class="sd">    :type equation_df: pd.DataFrame</span>
+<span class="sd">    :type main_product_df: pd.DataFrame</span>
+<span class="sd">    :return: The adjusted product DataFrame with corrected flow signs.</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">product_dataframe_temp</span> <span class="o">=</span> <span class="n">product_df</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+    <span class="n">intermediate_feedstock_product</span> <span class="o">=</span> <span class="n">equation_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">product_dataframe_temp</span><span class="p">,</span>
+        <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span>
+        <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;product_name&#39;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">intermediate_feedstock_product</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">product_df</span><span class="p">[</span><span class="s1">&#39;sign&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;positive&#39;</span>
+        <span class="k">return</span> <span class="n">product_df</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;sign&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;negative&#39;</span>
+        <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;product_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">]</span>
+        <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+
+        <span class="n">intermediate_cp</span> <span class="o">=</span> <span class="n">intermediate_feedstock_product</span><span class="p">[</span>
+            <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span>
+        <span class="p">]</span>
+        <span class="n">intermediate_wcp</span> <span class="o">=</span> <span class="n">intermediate_feedstock_product</span><span class="p">[</span>
+            <span class="n">intermediate_feedstock_product</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">intermediate_cp</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">intermediate_cp</span> <span class="o">=</span> <span class="n">intermediate_cp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">main_product_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;pathway&#39;</span><span class="p">)</span>
+            <span class="n">intermediate_cp</span> <span class="o">=</span> <span class="n">intermediate_cp</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;sign&#39;</span><span class="p">]]</span>
+
+        <span class="n">intermediate_wcp</span> <span class="o">=</span> <span class="n">intermediate_wcp</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;sign&#39;</span><span class="p">]]</span>
+
+        <span class="n">intermediate_edited</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">intermediate_cp</span><span class="p">,</span> <span class="n">intermediate_wcp</span><span class="p">])</span>
+
+        <span class="n">product_without_co_product</span> <span class="o">=</span> <span class="n">product_df</span><span class="p">[</span><span class="n">product_df</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">product_with_coproduct</span> <span class="o">=</span> <span class="n">product_df</span><span class="p">[</span><span class="n">product_df</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">product_without_co_product</span><span class="p">[</span><span class="s1">&#39;sign&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;positive&#39;</span>
+        <span class="n">product_with_coproduct</span><span class="p">[</span><span class="s1">&#39;sign&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;positive&#39;</span>
+
+        <span class="n">product_without_co_product</span> <span class="o">=</span> <span class="n">product_without_co_product</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;sign&#39;</span><span class="p">]]</span>
+        <span class="n">product_with_coproduct</span> <span class="o">=</span> <span class="n">product_with_coproduct</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;sign&#39;</span><span class="p">]]</span>
+
+        <span class="n">complete_product_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+            <span class="n">intermediate_edited</span><span class="p">,</span>
+            <span class="n">product_without_co_product</span><span class="p">,</span>
+            <span class="n">product_with_coproduct</span>
+        <span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">complete_product_dataframe</span></div>
+
+
+
+<div class="viewcode-block" id="reduce_extra_production">
+<a class="viewcode-back" href="../pareto.html#pareto.reduce_extra_production">[docs]</a>
+<span class="k">def</span> <span class="nf">reduce_extra_production</span><span class="p">(</span>
+    <span class="n">demand_summed</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">yr</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the total excess production beyond the demanded quantity.</span>
+
+<span class="sd">    Excess production is defined as the difference between actual product flow</span>
+<span class="sd">    and the demand by society.</span>
+
+<span class="sd">    :param demand_summed: DataFrame containing aggregated product flow and demand data.</span>
+<span class="sd">    :param yr: The target year for demand constraints.</span>
+<span class="sd">    :type demand_summed: pd.DataFrame</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :return: The total excess production.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">demand_summed</span><span class="p">[</span><span class="s1">&#39;excess_flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">demand_summed</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">-</span>
+        <span class="n">demand_summed</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Demand by society </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">demand_summed</span><span class="p">[</span><span class="s1">&#39;excess_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="create_metrics">
+<a class="viewcode-back" href="../pareto.html#pareto.create_metrics">[docs]</a>
+<span class="k">def</span> <span class="nf">create_metrics</span><span class="p">(</span>
+    <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">equation_dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the objective function for a given metric.</span>
+
+<span class="sd">    Aggregates the specified metric over all products to produce an overall objective value.</span>
+
+<span class="sd">    :param metrics: List of metric names; only the first metric is used.</span>
+<span class="sd">    :param equation_dataframe: DataFrame containing calculated process metrics.</span>
+<span class="sd">    :type metrics: list</span>
+<span class="sd">    :type equation_dataframe: pd.DataFrame</span>
+<span class="sd">    :return: A list containing the total metric value and the metric name.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># metrics should be just one</span>
+    <span class="n">met</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Construct objective expression by summing the metric over all products</span>
+    <span class="n">metric_val_total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">metric_df</span> <span class="o">=</span> <span class="n">equation_dataframe</span><span class="p">[[</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="n">met</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;product_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">metric_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">metric_val_total</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="n">met</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">metric_val_total</span><span class="p">,</span> <span class="n">met</span></div>
+
+
+
+<div class="viewcode-block" id="multiobjective_optimization">
+<a class="viewcode-back" href="../pareto.html#pareto.multiobjective_optimization">[docs]</a>
+<span class="k">def</span> <span class="nf">multiobjective_optimization</span><span class="p">(</span>
+    <span class="n">constrained_metric</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="p">,</span>
+    <span class="n">yr</span><span class="p">,</span>
+    <span class="n">trl</span><span class="p">,</span>
+    <span class="n">fix_2030_results</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform multi-objective optimization using Pyomo.</span>
+
+<span class="sd">    This function sets up and solves an optimization model by:</span>
+<span class="sd">    </span>
+<span class="sd">      1. Loading and preprocessing data.</span>
+<span class="sd">      2. Defining decision variables and constraints.</span>
+<span class="sd">      3. Deriving a constrained metric and adding its constraint.</span>
+<span class="sd">      4. Setting the objective function based on the provided metric.</span>
+<span class="sd">      5. Solving the model and performing post-processing to output results.</span>
+
+<span class="sd">    :param constrained_metric: List containing the metric to be constrained and its limit.</span>
+<span class="sd">    :param metrics: List containing the metric(s) used for the objective; only the first metric is used.</span>
+<span class="sd">    :param yr: The target year for constraints.</span>
+<span class="sd">    :param trl: Boolean flag indicating whether to filter for high TRL data.</span>
+<span class="sd">    :param fix_2030_results: Boolean flag determining if 2030 results should be fixed.</span>
+<span class="sd">    :type constrained_metric: list</span>
+<span class="sd">    :type metrics: list</span>
+<span class="sd">    :type yr: int</span>
+<span class="sd">    :type trl: bool</span>
+<span class="sd">    :type fix_2030_results: bool</span>
+<span class="sd">    :return: A tuple with:</span>
+<span class="sd">             - The final equation DataFrame containing calculated flows and metrics.</span>
+<span class="sd">             - The aggregated feedstock DataFrame.</span>
+<span class="sd">             - The complete product DataFrame.</span>
+<span class="sd">    :rtype: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ----------------- Create Output Folder -----------------</span>
+    <span class="c1"># Use the first metric in the list for naming purposes.</span>
+    <span class="n">metric_val</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">metrics</span>
+    <span class="n">output_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;results_</span><span class="si">{</span><span class="n">metric_val</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">_fix2030_</span><span class="si">{</span><span class="n">fix_2030_results</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 1. Initialize and Read Data</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ConcreteModel</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">load_and_filter_data</span><span class="p">(</span><span class="n">yr</span><span class="p">,</span> <span class="n">trl</span><span class="p">)</span>
+
+    <span class="c1"># Split into co-product &amp; no co-product and fill missing values</span>
+    <span class="n">data_cp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_wcp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Adjust feedstock usage with co-product logic</span>
+    <span class="n">data_cp</span> <span class="o">=</span> <span class="n">sum_co_products</span><span class="p">(</span><span class="n">data_cp</span><span class="p">)</span>
+    <span class="n">data_wcp</span> <span class="o">=</span> <span class="n">sum_co_products</span><span class="p">(</span><span class="n">data_wcp</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data_cp</span><span class="p">,</span> <span class="n">data_wcp</span><span class="p">])</span>
+
+    <span class="c1"># Load constraint data</span>
+    <span class="n">feedstock2</span><span class="p">,</span> <span class="n">product2</span> <span class="o">=</span> <span class="n">load_constraint_data</span><span class="p">(</span><span class="n">yr</span><span class="p">)</span>
+
+    <span class="c1"># Merge constraints into main dataset</span>
+    <span class="n">data_product_limit</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">product2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Chemical&#39;</span><span class="p">)</span>
+    <span class="n">data_feedstock_limit</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">feedstock2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Create smaller supply &amp; demand DataFrames</span>
+    <span class="n">supply_dataframe</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">data_feedstock_limit</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]]</span>
+        <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">demand_dataframe</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">data_product_limit</span><span class="p">[[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Demand by society </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]]</span>
+        <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Build dictionary for co-product processes</span>
+    <span class="n">data_cp_dic</span> <span class="o">=</span> <span class="n">build_co_product_dictionary</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Create a DataFrame to flag main-product processes</span>
+    <span class="n">main_product_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;pathway&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data_cp_dic</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
+        <span class="s1">&#39;indicator&#39;</span><span class="p">:</span> <span class="s1">&#39;copy of one product&#39;</span>
+    <span class="p">})</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 2. Define Sets &amp; Variables</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">pathways</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Long name&#39;</span><span class="p">]))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">Set</span><span class="p">(</span><span class="n">initialize</span><span class="o">=</span><span class="n">pathways</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">NonNegativeReals</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">NonNegativeReals</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 3. Build Equation DataFrame</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">equation_dataframe</span> <span class="o">=</span> <span class="n">build_equation_dataframe</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 4. Define Constraints</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">ConstraintList</span><span class="p">()</span>
+
+    <span class="c1"># 4.1 Feedstock constraints</span>
+    <span class="n">feedstock_dataframe</span> <span class="o">=</span> <span class="n">equation_dataframe</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;Co-product&#39;</span><span class="p">,</span> <span class="s1">&#39;pathway&#39;</span><span class="p">]]</span>
+    <span class="n">feedstock_cp</span> <span class="o">=</span> <span class="n">feedstock_dataframe</span><span class="p">[</span><span class="n">feedstock_dataframe</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]]</span>
+    <span class="n">feedstock_wcp</span> <span class="o">=</span> <span class="n">feedstock_dataframe</span><span class="p">[</span><span class="o">~</span><span class="n">feedstock_dataframe</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">feedstock_cp</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">feedstock_cp</span> <span class="o">=</span> <span class="n">feedstock_cp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">main_product_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;pathway&#39;</span><span class="p">)</span>
+        <span class="n">feedstock_cp</span> <span class="o">=</span> <span class="n">feedstock_cp</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]]</span>
+
+    <span class="n">feedstock_wcp</span> <span class="o">=</span> <span class="n">feedstock_wcp</span><span class="p">[[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]]</span>
+    <span class="n">feedstock_combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">feedstock_cp</span><span class="p">,</span> <span class="n">feedstock_wcp</span><span class="p">])</span>
+    <span class="n">feedstock_summed</span> <span class="o">=</span> <span class="n">feedstock_combined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">)[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">feedstock_summed</span> <span class="o">=</span> <span class="n">feedstock_summed</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">supply_dataframe</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">feedstock_summed</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Availability </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">])</span>
+
+    <span class="c1"># 4.2 Demand constraints</span>
+    <span class="n">product_dataframe_temp</span> <span class="o">=</span> <span class="n">equation_dataframe</span><span class="p">[[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Co-product&#39;</span><span class="p">,</span> <span class="s1">&#39;price_total&#39;</span><span class="p">]]</span>
+    <span class="n">complete_product_dataframe</span> <span class="o">=</span> <span class="n">product_dataframe_editor</span><span class="p">(</span><span class="n">product_dataframe_temp</span><span class="p">,</span> <span class="n">equation_dataframe</span><span class="p">,</span> <span class="n">main_product_df</span><span class="p">)</span>
+    <span class="n">demand_summed</span> <span class="o">=</span> <span class="n">complete_product_dataframe</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;product_name&#39;</span><span class="p">)[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">demand_summed</span> <span class="o">=</span> <span class="n">demand_summed</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">demand_dataframe</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;Chemical&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">demand_summed</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Demand by society </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># 4.3 Co-product linking constraints</span>
+    <span class="n">co_product_df</span> <span class="o">=</span> <span class="n">equation_dataframe</span><span class="p">[[</span><span class="s1">&#39;pathway&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">co_product_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;pathway&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">dic_key</span> <span class="ow">in</span> <span class="n">data_cp_dic</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">all_prods</span> <span class="o">=</span> <span class="n">data_cp_dic</span><span class="p">[</span><span class="n">dic_key</span><span class="p">]</span>
+        <span class="n">main_prod</span> <span class="o">=</span> <span class="n">all_prods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_prods</span><span class="p">)):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">co_product_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">main_prod</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span> <span class="o">==</span>
+                <span class="n">co_product_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_prods</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 5. Extra Constraint Handling (Fix 2030 if needed)</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="k">if</span> <span class="n">fix_2030_results</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./pickle/&#39;</span> <span class="o">+</span> <span class="n">metric_val</span> <span class="o">+</span> <span class="s1">&#39;2030data.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">loaded_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">reduce_extra_production</span><span class="p">(</span><span class="n">demand_summed</span><span class="p">,</span> <span class="n">yr</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.36379692400003269</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">reduce_extra_production</span><span class="p">(</span><span class="n">demand_summed</span><span class="p">,</span> <span class="n">yr</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">9.089951014118469e-8</span>
+        <span class="p">)</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 6. Derive Constrained Metric</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">c_metric_val_total</span><span class="p">,</span> <span class="n">c_met</span> <span class="o">=</span> <span class="n">create_metrics</span><span class="p">(</span><span class="n">constrained_metric</span><span class="p">,</span> <span class="n">equation_dataframe</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c_metric_val_total</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">constrained_metric</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="c1"># 7. Solve Model for Each Metric</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+    <span class="n">metric_val_total</span><span class="p">,</span> <span class="n">met</span> <span class="o">=</span> <span class="n">create_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">equation_dataframe</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">del_component</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">metric_val_total</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="n">minimize</span><span class="p">)</span>
+
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">SolverFactory</span><span class="p">(</span><span class="s1">&#39;glpk&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">met</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">trl</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fix_2030_results</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal Solution for metric: </span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective value = </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">expr</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    for m in model.M:</span>
+<span class="sd">        print(f&quot;{m}: {model.x[m].value}&quot;)</span>
+
+<span class="sd">    if &#39;Iterations&#39; in result.solver:</span>
+<span class="sd">        print(f&quot;Total Iterations: {result.solver.Iterations}&quot;)</span>
+<span class="sd">    if &#39;Nodes&#39; in result.solver:</span>
+<span class="sd">        print(f&quot;Total Nodes Explored: {result.solver.Nodes}&quot;)</span>
+<span class="sd">    print(result.solver.termination_condition)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ----------------------------------------------------------</span>
+    <span class="c1"># 8. Post-Processing: Final Solution Details</span>
+    <span class="c1"># ----------------------------------------------------------</span>
+    <span class="n">variable_list_final</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pathway_list_final</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">model_df_dic_result</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">M</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">variable_list_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">pathway_list_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">model_df_dic_result</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="n">model_df_result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">:</span> <span class="n">variable_list_final</span><span class="p">,</span>
+        <span class="s1">&#39;pathway&#39;</span><span class="p">:</span> <span class="n">pathway_list_final</span>
+    <span class="p">})</span>
+
+    <span class="c1"># Save pickle file into output folder</span>
+    <span class="n">pickle_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./pickle&quot;</span><span class="p">,</span> <span class="n">met</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s2">data.pkl&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">model_df_dic_result</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+    <span class="n">equation_dataframe_result</span> <span class="o">=</span> <span class="n">model_df_result</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;pathway&#39;</span><span class="p">,</span>
+        <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;Long name&#39;</span>
+    <span class="p">)</span>
+
+    <span class="n">wcp_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">cp_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Co-product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">feedstock_wcp_res</span> <span class="o">=</span> <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="n">wcp_mask</span><span class="p">]</span>
+    <span class="n">feedstock_cp_res</span> <span class="o">=</span> <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="n">cp_mask</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">feedstock_cp_res</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">feedstock_dataframe_temp_result_joined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">feedstock_cp_res</span> <span class="o">=</span> <span class="n">feedstock_cp_res</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">main_product_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;pathway&#39;</span><span class="p">)</span>
+        <span class="n">feedstock_dataframe_temp_result_joined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+            <span class="n">feedstock_wcp_res</span><span class="p">,</span>
+            <span class="n">feedstock_cp_res</span>
+        <span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">feedstock_cp_res</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">feedstock_dataframe_temp_result</span> <span class="o">=</span> <span class="n">feedstock_dataframe_temp_result_joined</span><span class="p">[</span>
+            <span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">feedstock_dataframe_temp_result</span> <span class="o">=</span> <span class="n">feedstock_wcp_res</span><span class="p">[</span>
+            <span class="p">[</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">,</span> <span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="n">feedstock_dataframe_temp_result</span> <span class="o">=</span> <span class="n">feedstock_dataframe_temp_result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Feedstock&#39;</span><span class="p">)[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Feedstock_flow&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;MMT product per 1 MMT feedstock&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;price_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Price (billion USD / MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;ghg_emissions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;GHG emissions (MMT CO2e/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;human_toxicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Human toxicity (MMT 1,4-DCB eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;electricity_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Electricity use (TWh/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;hydrogen_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Hydrogen use (MMT/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;fossil_fuel_depletion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Fossil fuel depletion (MMT oil eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;land_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Land use (km2*a crop eq/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;water_depletion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Water depletion (km3/MMT)&#39;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+     
+    <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;product_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equation_dataframe_result</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]</span>
+
+    <span class="n">product_dataframe_result</span> <span class="o">=</span> <span class="n">equation_dataframe_result</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;product_flow&#39;</span><span class="p">,</span> <span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Co-product&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Co-product 1 long name&#39;</span><span class="p">,</span> <span class="s1">&#39;price_total&#39;</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">complete_product_dataframe_result</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">product_dataframe_editor</span><span class="p">(</span>
+            <span class="n">product_dataframe_result</span><span class="p">,</span>
+            <span class="n">equation_dataframe_result</span><span class="p">,</span>
+            <span class="n">main_product_df</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;product_name&#39;</span><span class="p">)[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Save CSV outputs to output folder</span>
+    <span class="n">eq_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">equation_dataframe.csv&quot;</span><span class="p">)</span>
+    <span class="n">prod_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">product_dataframe.csv&quot;</span><span class="p">)</span>
+    <span class="n">feed_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">feedstock_dataframe.csv&quot;</span><span class="p">)</span>
+    <span class="n">demand_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">demand_validity.csv&quot;</span><span class="p">)</span>
+    <span class="n">equation_dataframe_result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">eq_csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">complete_product_dataframe_result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">prod_csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">feedstock_dataframe_temp_result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">feed_csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">product_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;product_limits.csv&#39;</span><span class="p">)</span>
+    <span class="n">product_data</span><span class="p">[</span><span class="s1">&#39;product_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">product_data</span><span class="p">[</span><span class="s1">&#39;Chemical&#39;</span><span class="p">]</span>
+    <span class="n">data_product_limit2</span> <span class="o">=</span> <span class="n">product_data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">complete_product_dataframe_result</span><span class="p">,</span>
+        <span class="n">on</span><span class="o">=</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span>
+    <span class="p">)</span>
+    <span class="n">data_product_limit2</span><span class="p">[</span><span class="s1">&#39;excess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+        <span class="n">data_product_limit2</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">-</span>
+        <span class="n">data_product_limit2</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Demand by society </span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1"> (MMT)&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">data_product_limit2</span> <span class="o">=</span> <span class="n">data_product_limit2</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;missing&quot;</span><span class="p">)</span>
+    <span class="n">data_product_limit3</span> <span class="o">=</span> <span class="n">data_product_limit2</span><span class="p">[</span><span class="n">data_product_limit2</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;missing&quot;</span><span class="p">]</span>
+    <span class="n">data_product_limit4</span> <span class="o">=</span> <span class="n">data_product_limit2</span><span class="p">[</span><span class="n">data_product_limit2</span><span class="p">[</span><span class="s1">&#39;product_flow&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;missing&quot;</span><span class="p">]</span>
+    <span class="n">data_product_limit4</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">demand_csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total excess flow: &#39;</span><span class="p">,</span> <span class="n">data_product_limit4</span><span class="p">[</span><span class="s1">&#39;excess&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="n">missing_products</span> <span class="o">=</span> <span class="n">data_product_limit3</span>
+    <span class="n">missing_products</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;missing_products.csv&#39;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">indicators</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;price_total&#39;</span><span class="p">,</span> <span class="s1">&#39;ghg_emissions&#39;</span><span class="p">,</span> <span class="s1">&#39;human_toxicity&#39;</span><span class="p">,</span> <span class="s1">&#39;water_depletion&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;fossil_fuel_depletion&#39;</span><span class="p">,</span> <span class="s1">&#39;land_use&#39;</span><span class="p">,</span> <span class="s1">&#39;electricity_use&#39;</span><span class="p">,</span> <span class="s1">&#39;hydrogen_use&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Values of other metrics:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">equation_dataframe_result</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    print(&quot;\nModel Properties:&quot;)</span>
+<span class="sd">    print(f&quot;Total Variables: {model.nvariables()}&quot;)</span>
+<span class="sd">    print(f&quot;Total Constraints: {model.nconstraints()}&quot;)</span>
+<span class="sd">    print(f&quot;Total Objectives: {model.nobjectives()}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Return results for the last metric processed (or store them differently if needed)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">equation_dataframe_result</span><span class="p">,</span>
+        <span class="n">feedstock_dataframe_temp_result</span><span class="p">,</span>
+        <span class="n">complete_product_dataframe_result</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

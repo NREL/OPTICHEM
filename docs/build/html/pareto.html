@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pareto Documentation &mdash; Chemicals_Pathway_Optimizer 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=0ea5f55c"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Run_multiobjective_2030 Documentation" href="run_multiobjective_2030.html" />
+    <link rel="prev" title="Main Code Documentation" href="optimization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Chemicals_Pathway_Optimizer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_run.html">Main Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Main Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pareto Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.build_co_product_dictionary"><code class="docutils literal notranslate"><span class="pre">build_co_product_dictionary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.build_equation_dataframe"><code class="docutils literal notranslate"><span class="pre">build_equation_dataframe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.create_metrics"><code class="docutils literal notranslate"><span class="pre">create_metrics()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.load_and_filter_data"><code class="docutils literal notranslate"><span class="pre">load_and_filter_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.load_constraint_data"><code class="docutils literal notranslate"><span class="pre">load_constraint_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.multiobjective_optimization"><code class="docutils literal notranslate"><span class="pre">multiobjective_optimization()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.product_dataframe_editor"><code class="docutils literal notranslate"><span class="pre">product_dataframe_editor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.reduce_extra_production"><code class="docutils literal notranslate"><span class="pre">reduce_extra_production()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pareto.sum_co_products"><code class="docutils literal notranslate"><span class="pre">sum_co_products()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2030.html">Run_multiobjective_2030 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_multiobjective_2050.html">Run_multiobjective_2050 Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Chemicals_Pathway_Optimizer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pareto Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pareto.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pareto">
+<span id="pareto-documentation"></span><h1>Pareto Documentation<a class="headerlink" href="#module-pareto" title="Link to this heading"></a></h1>
+<p>Created on Thu Mar 13 10:22:35 2025</p>
+<dl class="field-list simple">
+<dt class="field-odd">author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tghosh</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.build_co_product_dictionary">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">build_co_product_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/pareto.html#build_co_product_dictionary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.build_co_product_dictionary" title="Link to this definition"></a></dt>
+<dd><p>Create a dictionary of co-product relationships from the data.</p>
+<p>The dictionary keys are unique identifiers and the values are sorted lists of co-product names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>pd.DataFrame</em>) -- DataFrame containing production process data with co-product information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping unique process keys to a list of associated co-products.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.build_equation_dataframe">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">build_equation_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/pareto.html#build_equation_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.build_equation_dataframe" title="Link to this definition"></a></dt>
+<dd><p>Link model decision variables (x) to the underlying DataFrame for physical flows.</p>
+<p>This function creates a DataFrame that connects each pathway (identified by its name)
+with its corresponding Pyomo decision variable and then merges it with the original data.
+It also computes derived metrics such as product flow, price, GHG emissions, and other impacts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- The Pyomo model containing the decision variables.</p></li>
+<li><p><strong>data</strong> (<em>pd.DataFrame</em>) -- DataFrame with process data and associated parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing the linked variables and computed metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.create_metrics">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">create_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation_dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/pareto.html#create_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.create_metrics" title="Link to this definition"></a></dt>
+<dd><p>Create the objective function for a given metric.</p>
+<p>Aggregates the specified metric over all products to produce an overall objective value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics</strong> (<em>list</em>) -- List of metric names; only the first metric is used.</p></li>
+<li><p><strong>equation_dataframe</strong> (<em>pd.DataFrame</em>) -- DataFrame containing calculated process metrics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the total metric value and the metric name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.load_and_filter_data">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">load_and_filter_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/pareto.html#load_and_filter_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.load_and_filter_data" title="Link to this definition"></a></dt>
+<dd><p>Load the main 'full_data.csv' dataset and filter it if TRL is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year (not used for filtering in the current implementation).</p></li>
+<li><p><strong>trl</strong> (<em>bool</em>) -- Boolean flag indicating whether to filter for high TRL data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas DataFrame containing the loaded (and possibly filtered) data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.load_constraint_data">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">load_constraint_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pareto.html#load_constraint_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.load_constraint_data" title="Link to this definition"></a></dt>
+<dd><p>Load additional constraint data for feedstock availability and product demand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>yr</strong> (<em>int</em>) -- The target year for which constraints are to be loaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple where the first element is a DataFrame of feedstock limits and the
+second is a DataFrame of product demand limits.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[pd.DataFrame, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.multiobjective_optimization">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">multiobjective_optimization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constrained_metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_2030_results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pareto.html#multiobjective_optimization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.multiobjective_optimization" title="Link to this definition"></a></dt>
+<dd><p>Perform multi-objective optimization using Pyomo.</p>
+<p>This function sets up and solves an optimization model by:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Loading and preprocessing data.</p></li>
+<li><p>Defining decision variables and constraints.</p></li>
+<li><p>Deriving a constrained metric and adding its constraint.</p></li>
+<li><p>Setting the objective function based on the provided metric.</p></li>
+<li><p>Solving the model and performing post-processing to output results.</p></li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constrained_metric</strong> (<em>list</em>) -- List containing the metric to be constrained and its limit.</p></li>
+<li><p><strong>metrics</strong> (<em>list</em>) -- List containing the metric(s) used for the objective; only the first metric is used.</p></li>
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year for constraints.</p></li>
+<li><p><strong>trl</strong> (<em>bool</em>) -- Boolean flag indicating whether to filter for high TRL data.</p></li>
+<li><p><strong>fix_2030_results</strong> (<em>bool</em>) -- Boolean flag determining if 2030 results should be fixed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple with:
+- The final equation DataFrame containing calculated flows and metrics.
+- The aggregated feedstock DataFrame.
+- The complete product DataFrame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.product_dataframe_editor">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">product_dataframe_editor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">product_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_product_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/pareto.html#product_dataframe_editor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.product_dataframe_editor" title="Link to this definition"></a></dt>
+<dd><p>Adjust the product DataFrame to account for intermediate feedstocks that are also products
+in a previous step (negative flow represents consumption).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>product_df</strong> (<em>pd.DataFrame</em>) -- DataFrame containing product flow data.</p></li>
+<li><p><strong>equation_df</strong> (<em>pd.DataFrame</em>) -- DataFrame linking process pathways with model variables.</p></li>
+<li><p><strong>main_product_df</strong> (<em>pd.DataFrame</em>) -- DataFrame that flags main-product processes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The adjusted product DataFrame with corrected flow signs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.reduce_extra_production">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">reduce_extra_production</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand_summed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/pareto.html#reduce_extra_production"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.reduce_extra_production" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total excess production beyond the demanded quantity.</p>
+<p>Excess production is defined as the difference between actual product flow
+and the demand by society.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>demand_summed</strong> (<em>pd.DataFrame</em>) -- DataFrame containing aggregated product flow and demand data.</p></li>
+<li><p><strong>yr</strong> (<em>int</em>) -- The target year for demand constraints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The total excess production.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pareto.sum_co_products">
+<span class="sig-prename descclassname"><span class="pre">pareto.</span></span><span class="sig-name descname"><span class="pre">sum_co_products</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/pareto.html#sum_co_products"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pareto.sum_co_products" title="Link to this definition"></a></dt>
+<dd><p>Adjust feedstock usage based on co-product fractions.</p>
+<p>This function computes the total product flow by summing co-product amounts
+and adjusts the main product mass fraction, total feedstock inflow, and the
+resulting product yield per unit feedstock.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) -- DataFrame containing feedstock and co-product usage data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified DataFrame with additional computed columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimization.html" class="btn btn-neutral float-left" title="Main Code Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="run_multiobjective_2030.html" class="btn btn-neutral float-right" title="Run_multiobjective_2030 Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TJ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

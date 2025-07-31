@@ -1,0 +1,87 @@
+Chemical,Long name,product_flow_x,product_flow_y,percent,Feedstock
+Acetone,Conventional benzene conversion to acetone,0.0,0.902148989899621,0.0,Conventional benzene conversion to acetone
+Benzene,Biomass pyrolysis to benzene,0.0,8.59923396728265,0.0,Biomass pyrolysis to benzene
+Benzene,Biomass to benzene via syngas and MTA,0.0,8.59923396728265,0.0,Biomass to benzene via syngas and MTA
+Benzene,Plastic to benzene via syngas and MTA,1.4019698702241085e-16,8.59923396728265,1.6303427439678438e-15,Plastic to benzene via syngas and MTA
+Benzene,CO2 to benzene via syngas and MTA,0.0,8.59923396728265,0.0,CO2 to benzene via syngas and MTA
+Benzene,CO2 to benzene via thermochem and MTA,0.0,8.59923396728265,0.0,CO2 to benzene via thermochem and MTA
+Benzene,CO2 to benzene via electrochem and MTA,0.0,8.59923396728265,0.0,CO2 to benzene via electrochem and MTA
+Ethylene,Biomass pyrolysis to ethylene,0.0,55.90091489542503,0.0,Biomass pyrolysis to ethylene
+Ethylene,CO2 to ethylene via thermochem and methanol-to-olefins,0.0,55.90091489542503,0.0,CO2 to ethylene via thermochem and methanol-to-olefins
+Ethylene,Biomass to ethylene via syngas and methanol-to-olefins,12.04876436914927,55.90091489542503,21.553787432082526,Biomass to ethylene via syngas and methanol-to-olefins
+Ethylene,CO2 to ethylene via syngas and methanol-to-olefins,0.0,55.90091489542503,0.0,CO2 to ethylene via syngas and methanol-to-olefins
+Ethylene,CO2 to ethylene via electrochem and methanol-to-olefins,0.0,55.90091489542503,0.0,CO2 to ethylene via electrochem and methanol-to-olefins
+Phenol,Conventional benzene conversion to phenol,0.0,0.892757404,0.0,Conventional benzene conversion to phenol
+Propylene,Biomass to propylene via syngas and methanol-to-olefins,12.04876436914927,17.115693122776047,70.39600606717961,Biomass to propylene via syngas and methanol-to-olefins
+Propylene,CO2 to propylene via syngas and methanol-to-olefins,0.0,17.115693122776047,0.0,CO2 to propylene via syngas and methanol-to-olefins
+Propylene,CO2 to propylene via thermochem and methanol-to-olefins,0.0,17.115693122776047,0.0,CO2 to propylene via thermochem and methanol-to-olefins
+Propylene,Biomass pyrolysis to propylene,0.0,17.115693122776047,0.0,Biomass pyrolysis to propylene
+Propylene,CO2 to propylene via electrochem and methanol-to-olefins,0.0,17.115693122776047,0.0,CO2 to propylene via electrochem and methanol-to-olefins
+Toluene,Biomass pyrolysis to toluene,0.0,7.236769638492011,0.0,Biomass pyrolysis to toluene
+Toluene,Biomass to toluene via syngas and MTA,0.0,7.236769638492011,0.0,Biomass to toluene via syngas and MTA
+Toluene,Plastic to toluene via syngas and MTA,4.431657581457076e-16,7.236769638492011,6.123806342936929e-15,Plastic to toluene via syngas and MTA
+Toluene,CO2 to toluene via syngas and MTA,0.0,7.236769638492011,0.0,CO2 to toluene via syngas and MTA
+Toluene,CO2 to toluene via thermochem and MTA,0.0,7.236769638492011,0.0,CO2 to toluene via thermochem and MTA
+Toluene,CO2 to toluene via electrochem and MTA,0.0,7.236769638492011,0.0,CO2 to toluene via electrochem and MTA
+Xylenes,Biomass pyrolysis to xylenes,0.0,9.40571783044498,0.0,Biomass pyrolysis to xylenes
+Xylenes,Biomass to xylenes via syngas and MTA,0.0,9.40571783044498,0.0,Biomass to xylenes via syngas and MTA
+Xylenes,Plastic to xylenes via syngas and MTA,0.0,9.40571783044498,0.0,Plastic to xylenes via syngas and MTA
+Xylenes,CO2 to xylenes via syngas and MTA,0.0,9.40571783044498,0.0,CO2 to xylenes via syngas and MTA
+Xylenes,CO2 to xylenes via thermochem and MTA,0.0,9.40571783044498,0.0,CO2 to xylenes via thermochem and MTA
+Xylenes,CO2 to xylenes via electrochem and MTA,0.0,9.40571783044498,0.0,CO2 to xylenes via electrochem and MTA
+"1,4-Butanediol","Conventional 1,4-butanediol production",0.0,0.281053036,0.0,"Conventional 1,4-butanediol production"
+"1,4-Butanediol","Biomass fermentation to 1,4-BDO",0.0,0.281053036,0.0,"Biomass fermentation to 1,4-BDO"
+2-Ethylhexanol,Biomass gasification to 2-ethylhexanol via syngas,0.0,0.5653159220000039,0.0,Biomass gasification to 2-ethylhexanol via syngas
+Acetic acid,Conventional acetic acid production,0.0,3.5879137660000002,0.0,Conventional acetic acid production
+Acetic acid,CO2 fermentation to acetic acid,0.0,3.5879137660000002,0.0,CO2 fermentation to acetic acid
+Acetic acid,CO2 electrolysynthesis to acetic acid,0.0,3.5879137660000002,0.0,CO2 electrolysynthesis to acetic acid
+Acetone,CO2 fermentation to acetone,0.0,0.902148989899621,0.0,CO2 fermentation to acetone
+Acrylic acid,Food waste dehydration via lactic acid,0.0,1.372827642,0.0,Food waste dehydration via lactic acid
+Acrylic acid,Biomass fermentation to acrylic acid,0.0,1.372827642,0.0,Biomass fermentation to acrylic acid
+Acrylonitrile,Food waste to acrylonitrile via VFAs,0.0,1.269399377,0.0,Food waste to acrylonitrile via VFAs
+Adipic acid,Conventional butadiene conversion to adipic acid,0.0,1.092181119,0.0,Conventional butadiene conversion to adipic acid
+Adipic acid,PET to adipic acid via TPA fermentation,0.0,1.092181119,0.0,PET to adipic acid via TPA fermentation
+Adipic acid,Biomass fermentation to adipic acid,0.0,1.092181119,0.0,Biomass fermentation to adipic acid
+Adipic acid,PS to adipic acid via benzoic acid,0.0,1.092181119,0.0,PS to adipic acid via benzoic acid
+Aniline,Biomass fermentation to aniline,0.0,0.40849777,0.0,Biomass fermentation to aniline
+Benzene,Conventional benzene production,0.0,8.59923396728265,0.0,Conventional benzene production
+Butadiene,CO2 to butadiene via ethanol,0.0,1.6352811977100001,0.0,CO2 to butadiene via ethanol
+Butanol,Biomass fermentation to butanol,0.0,1.148167689,0.0,Biomass fermentation to butanol
+Butylene,Biomass to butylene via DME,0.0,12.686055061413049,0.0,Biomass to butylene via DME
+Butylene,CO2 to butylene via ethanol,0.0,12.686055061413049,0.0,CO2 to butylene via ethanol
+Butylene,Biomass to butylene via ethanol,0.0,12.686055061413049,0.0,Biomass to butylene via ethanol
+Caprolactam,Biomass fermentation to caprolactam,0.0,0.506452736,0.0,Biomass fermentation to caprolactam
+Chloroform,CH4 chlorination to chloroform,0.0,0.24138873400000002,0.0,CH4 chlorination to chloroform
+Cyclohexanol-cyclohexanone,Biomass to KA oil via RCF phenol,0.0,0.046554112,0.0,Biomass to KA oil via RCF phenol
+Ethanol,Conventional ethanol production,42.99464201420349,53.324521628612054,80.62827513699455,Conventional ethanol production
+Ethanol,CO2 fermentation to ethanol,10.32987961440856,53.324521628612054,19.37172486300545,CO2 fermentation to ethanol
+Ethanol,Biomass fermentation to ethanol,0.0,53.324521628612054,0.0,Biomass fermentation to ethanol
+Ethylene,Conventional ethylene production,43.852150526275764,55.90091489542503,78.44621256791747,Conventional ethylene production
+Ethylene,CO2 fermentation to ethylene via ethanol,0.0,55.90091489542503,0.0,CO2 fermentation to ethylene via ethanol
+Ethylene,Biomass fermentation to ethylene via ethanol,0.0,55.90091489542503,0.0,Biomass fermentation to ethylene via ethanol
+Ethylene,CO2 electrolysis to ethylene,0.0,55.90091489542503,0.0,CO2 electrolysis to ethylene
+Formaldehyde,Biomass to formaldehyde via syngas,0.0,7.274395224999999,0.0,Biomass to formaldehyde via syngas
+Formaldehyde,CO2 conversion to formaldehyde via formic acid,0.0,7.274395224999999,0.0,CO2 conversion to formaldehyde via formic acid
+Hexamethylenediamine,Biomass fermentation to hexamethylenediamine,0.0,0.913704585,0.0,Biomass fermentation to hexamethylenediamine
+Isopropanol,Conventional propylene conversion to isopropanol,0.0,0.4218289050000001,0.0,Conventional propylene conversion to isopropanol
+Isopropanol,CO2 fermentation to isopropanol,0.0,0.4218289050000001,0.0,CO2 fermentation to isopropanol
+Lactic acid,Conventional lactic acid production,0.0,0.507239657,0.0,Conventional lactic acid production
+Lysine,CO2 fermentation to lysine,0.0,0.818882211,0.0,CO2 fermentation to lysine
+Maleic anhydride,Conventional propylene via butanol to maleic anhydride,0.0,0.36699064100000006,0.0,Conventional propylene via butanol to maleic anhydride
+Maleic anhydride,Conventional butylene conversion to maleic anhydride,0.0,0.36699064100000006,0.0,Conventional butylene conversion to maleic anhydride
+Methanol,Biomass to methanol via syngas,0.0,14.754593655659987,0.0,Biomass to methanol via syngas
+Methanol,Plastic to methanol via syngas,0.0,14.754593655659987,0.0,Plastic to methanol via syngas
+Methanol,CO2 to methanol via syngas,0.0,14.754593655659987,0.0,CO2 to methanol via syngas
+Methanol,CO2 to methanol via thermochemistry,0.0,14.754593655659987,0.0,CO2 to methanol via thermochemistry
+Methanol,CO2 to methanol via electrochemistry,0.0,14.754593655659987,0.0,CO2 to methanol via electrochemistry
+Methyl chloride,CH4 chlorination to methylamine,0.0,0.38514159899999995,0.0,CH4 chlorination to methylamine
+Methylamine,Conventional methylamine produciton,0.0,0.346670316,0.0,Conventional methylamine produciton
+Methylene diphenyl diisocyanate,CO2 fermentation to MDI via syngas,0.0,2.478864076,0.0,CO2 fermentation to MDI via syngas
+Phenol,Biomass to phenol via RCF oil,0.0,0.892757404,0.0,Biomass to phenol via RCF oil
+Phosgene,CO2 to phosgene via syngas,0.0,5.011668735000001,0.0,CO2 to phosgene via syngas
+Phosgene,Conventional phosgene production,0.0,5.011668735000001,0.0,Conventional phosgene production
+Propylene,Conventional propylene production,5.066928753626778,17.115693122776047,29.603993932820387,Conventional propylene production
+Propylene,CO2 fermentation to propylene via ethanol,0.0,17.115693122776047,0.0,CO2 fermentation to propylene via ethanol
+Propylene,Biomass fermentation to propylene via ethanol,0.0,17.115693122776047,0.0,Biomass fermentation to propylene via ethanol
+Propylene glycol,Lactic acid fermentation to propylene glycol,0.0,0.677784667,0.0,Lactic acid fermentation to propylene glycol
+Sorbitol,Biomass fermentation to sorbitol,0.0,0.440444654,0.0,Biomass fermentation to sorbitol

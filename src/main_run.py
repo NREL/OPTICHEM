@@ -45,10 +45,10 @@ def parse_user_inputs() -> tuple[int, bool, str, bool]:
     :rtype: tuple[int, bool, str, bool]
     """
     # Hard-coded inputs here; could be replaced with arg parsing
-    yr = [2050]  # Note: if multiple years are provided, the first element is used for folder naming.
+    yr = [2030,2050]  # Note: if multiple years are provided, the first element is used for folder naming.
     trl = True  # High TRL if year == 2030 (this may need adjustment if yr is a list)
-    metric_list = ["price_total"]  # Similar note as above.
-    fix_2030_results = True
+    metric_list = ["ghg_emissions", "price_total", "human_toxicity"]  # Similar note as above.
+    fix_2030_results = False
 
     return yr, trl, metric_list, fix_2030_results
 
@@ -72,7 +72,7 @@ def run_optimization(yr: int, trl: bool, fix_2030_results: bool, metric: str):
     :rtype: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
     """
     eq_df, feed_df, prod_df = multiobjective_optimization(
-        constrained_metric=['ghg_emissions',0],
+        constrained_metric=[],
         metrics=[metric],
         yr=yr,
         trl=trl,

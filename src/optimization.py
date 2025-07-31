@@ -483,14 +483,6 @@ def multiobjective_optimization(
             reduce_extra_production(demand_summed, yr) <= 9.089951014118469e-8
         )
 
-
-    # --------------------------------------------------------------
-    # 6. Derive Constrained Metric
-    # --------------------------------------------------------------
-    c_metric_val_total, c_met = create_metrics(constrained_metric, equation_dataframe)
-    model.constraints.add(c_metric_val_total <= float(constrained_metric[1]))
-
-
     # --------------------------------------------------------------
     # 6. Solve Model for Each Metric
     # --------------------------------------------------------------
